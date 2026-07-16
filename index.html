@@ -1,0 +1,235 @@
+﻿<!DOCTYPE html>
+<html>
+
+
+
+    <!--タイトル-->
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>謎解き(仮)</title>
+        <link rel="stylesheet" href="css/style.css" />
+
+
+
+
+        <style>
+
+
+            /* ★新しく追加する：トップのバナー画像のデザイン */
+            header {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                overflow: hidden; /* 画像がはみ出さないようにするマキエ */
+            }
+
+            .top-banner {
+                width: 100%; /* 画面の横幅いっぱいに広げる */
+                height: auto; /* 縦横比を崩さずに拡大縮小する */
+                display: block; /* 画像の下に変な隙間ができるのを防ぐ */
+                object-fit: cover; /* 画面に合わせて画像を綺麗にフィットさせる */
+                /* もし少し角を丸くしてオシャレにしたい場合は、下の行のコメントアウト（/* ）を消してください */
+                /* border-radius: 0 0 12px 12px; */ /* 下の角だけ丸くする */
+            }
+
+            /* ついでに、すぐ下にある「文化祭謎解き」のタイトルの上の余白を少しあける */
+            h1 {
+                margin-top: 20px;
+                text-align: center;
+            }
+            /* 謎1〜4のリンクを大きなボタンにする */
+            /* 謎1〜4のリンクを大きなボタンにする */
+            main h2 a {
+                display: block;
+                background-color: #007bff;
+                color: white;
+                text-decoration: none;
+                padding: 20px;
+                margin-bottom: 15px;
+                border-radius: 8px;
+                text-align: center;
+                font-size: 20px;
+                font-weight: bold;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* 少し影をつけて立体的に */
+                transition: background-color 0.2s;
+            }
+
+                main h2 a:active {
+                    background-color: #0056b3;
+                }
+
+            /* =====================================
+   ★新しく追加する：最終解答エリアのデザイン
+===================================== */
+            .final-answer-container {
+                background-color: #fff9e6; /* ほんのり温かみのある背景色 */
+                border: 2px dashed #ffc107; /* ナゾトキっぽい点線の枠 */
+                padding: 25px 20px;
+                border-radius: 12px;
+                margin-top: 40px;
+                margin-bottom: 20px;
+                text-align: center;
+            }
+
+                .final-answer-container p {
+                    font-size: 18px;
+                    font-weight: bold;
+                    color: #333;
+                    margin-bottom: 15px;
+                }
+
+            /* 入力欄のデザイン */
+            #answer-input {
+                width: 80%;
+                max-width: 300px;
+                padding: 12px;
+                font-size: 18px;
+                border: 2px solid #ccc;
+                border-radius: 6px;
+                text-align: center;
+                margin-bottom: 15px;
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+                /* 入力欄が選択されたとき（青い光をあてる） */
+                #answer-input:focus {
+                    border-color: #007bff;
+                    outline: none;
+                    box-shadow: 0 0 8px rgba(0,123,255,0.2);
+                }
+
+            /* 回答するボタンのデザイン */
+            #submit-button {
+                background-color: #dc3545; /* 最終決定っぽい「赤」ボタン */
+                color: white;
+                border: none;
+                padding: 12px 30px;
+                font-size: 18px;
+                font-weight: bold;
+                border-radius: 6px;
+                cursor: pointer;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                display: block;
+                margin: 0 auto;
+                width: 60%;
+                max-width: 200px;
+            }
+
+                #submit-button:active {
+                    background-color: #bd2130;
+                }
+
+                /* ボタンや入力欄が無効化（disabled）されたとき */
+                #answer-input:disabled, #submit-button:disabled {
+                    background-color: #e9ecef;
+                    color: #6c757d;
+                    border-color: #ced4da;
+                    box-shadow: none;
+                    cursor: not-allowed;
+                }
+
+            /* 結果メッセージの余白調整 */
+            #message {
+                margin-top: 20px;
+            }
+        </style>
+    </head>
+
+    
+
+
+
+
+    <body>
+
+        <!--ヘッダー-->
+        <header>
+            <img src="images/kkklogo.jpg" alt="文化祭謎解きトップバナー" class="top-banner" />
+        </header>
+
+
+        <h1>文化祭謎解き</h1>
+
+        <!--メイン-->
+        <main>
+            <p>このサイトから謎解きに挑戦できます</p>
+            <h2><a href="question/question1.html">謎1</a></h2>
+            <h2><a href="question/question2.html">謎2</a></h2>
+            <h2><a href="question/question3.html">謎3</a></h2>
+            <h2><a href="question/question4.html">謎4</a></h2>
+        </main>
+
+
+        <div class="final-answer-container">
+            <p>四つの謎を解いて、その答えを組み合わせたものを答えろ</p>
+            <input type="text" id="answer-input" placeholder="答えを入力してください" />
+            <button id="submit-button">回答する</button>
+            <div id="message" class="result-message"></div>
+        </div>
+
+        <script>
+        // HTMLの要素をJavaScriptに読み込みます
+        const button = document.getElementById("submit-button");
+        const input = document.getElementById("answer-input");
+        const message = document.getElementById("message");
+
+        // 💡 ページを開いた瞬間に、すでにクリアしているか確認する
+        window.addEventListener("load", function () {
+            // localStorageから「q1_cleared」というメモを読み出す
+            let isCleared = localStorage.getItem("game_cleared");
+
+            if (isCleared === "true") {
+                // すでにクリアしていたら、最初から正解画面にしておく
+                showSuccess();
+            }
+        });
+
+        // ボタンがクリックされたときの処理
+        button.addEventListener("click", function () {
+            let userAnswer = input.value.trim().toLowerCase();
+
+            if (userAnswer === "1853") {
+                // 💡 正解したら、localStorageに「q1_cleared = true」と保存する
+                localStorage.setItem("game_cleared", "true");
+                showSuccess();
+            }
+
+            else if (userAnswer === "reset") {
+                localStorage.clear();
+                message.textContent = "リセットします";
+            }
+
+            else {
+                message.textContent = "❌ 違います。もう一度考えてみよう！";
+                message.style.color = "#dc3545";
+            }
+        });
+
+        // ⭕ 正解の表示を共通化する関数
+        // ⭕ 正解の表示を共通化する関数
+            // ⭕ 正解の表示を共通化する関数
+            function showSuccess() {
+                // 1. まずは画面に表示するHTML（文字やリンク）をセット
+                message.innerHTML = `
+        <p style="font-size: 24px; color: #28a745; margin-bottom: 10px;">⭕ 正解！</p>
+
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; text-align: left; border: 1px solid #dee2e6; margin-bottom: 15px;">
+            ある人物の画像をゲットした!!
+        </div>
+
+        <a href="clear.html" style="display: inline-block; background-color: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">クリア画面へ移動する</a>
+    `;
+
+                // 2. JavaScriptのプログラムとしての処理は、バッククォーツの「外」に書く！
+                
+                input.value = "1853";        // 答えを固定
+            }
+        </script>
+        <!--フッター-->
+        <footer>
+        </footer>
+    </body>
+</html>
