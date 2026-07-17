@@ -1,0 +1,233 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>謎2</title>
+
+    <style>
+        /* レイアウトを少し見やすく整える */
+        body {
+            font-family: sans-serif;
+            max-width: 500px; /* 画面が横に広がりすぎないように制限 */
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        img {
+            max-width: 100%; /* 画像が画面からはみ出さないようにする */
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        /* スマホで文字が小さすぎて拡大されるのを防ぐ */
+        input[type="text"] {
+            font-size: 16px;
+            padding: 12px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 10px; /* ボタンとの隙間をあける */
+        }
+
+        /* ボタンを押しやすくする */
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            background-color: #007bff; /* パッと見でボタンとわかる青 */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%; /* スマホの横幅いっぱいに広げて押しやすく */
+        }
+
+        /* 結果メッセージのスタイル */
+        .result-message {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+
+
+        h2 a {
+            display: block; /* 文字だけでなく、四角い枠全体を押せるようにする */
+            background-color: #007bff; /* ボタンの背景色（青） */
+            color: white; /* 文字の色（白） */
+            text-decoration: none; /* リンクの下線を消す */
+            padding: 20px; /* ボタンの中に余白を作って大きくする */
+            margin-bottom: 15px; /* ボタンとボタンの間に隙間をあける */
+            border-radius: 8px; /* 角を少し丸くする */
+            text-align: center; /* 文字を中央に */
+            font-size: 20px; /* 文字を大きくする */
+        }
+
+
+
+
+
+        /* ヒント全体のグループ */
+        .hint-container {
+            margin: 30px 0;
+            text-align: left; /* ヒントは読みやすいように左寄せ */
+        }
+
+        /* ヒントのカード全体 */
+        .hint-box {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+            /* 開いている状態のカードの枠線を少し強調 */
+            .hint-box[open] {
+                border-color: #ffc107;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            }
+
+        /* タップする部分（見出し）のデザイン */
+        .hint-summary {
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #495057;
+            cursor: pointer;
+            list-style: none; /* デフォルトの三角形の矢印を消す（一部ブラウザ用） */
+            outline: none;
+            user-select: none; /* 連打しても青く選択されないようにする */
+        }
+
+            /* タップ部分の左側に小さな矢印（▶）を自作する */
+            .hint-summary::before {
+                content: "▶";
+                display: inline-block;
+                margin-right: 8px;
+                color: #ffc107; /* ゴールドの矢印 */
+                transition: transform 0.2s;
+            }
+
+        /* 開いたときに矢印を下（▼）に向ける */
+        .hint-box[open] .hint-summary::before {
+            transform: rotate(90deg); /* 90度回転させて下向きにする */
+        }
+
+        /* ヒントの中身（表示される文章）の余白 */
+        .hint-content {
+            padding: 0 15px 15px 15px;
+            font-size: 15px;
+            color: #6c757d;
+            line-height: 1.6;
+            border-top: 1px dashed #dee2e6; /* 開いたときに境界線を点線にする */
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <p>?に入る数字を答えろ(半角数字で答えてください)</p>
+
+    <div class="hint-container">
+
+        <details class="hint-box">
+            <summary class="hint-summary">ヒント1（タップして開く）</summary>
+            <div class="hint-content">
+                <p>この人物たちは上から</p>
+                <p>徳川家康</p>
+                <p>織田信長</p>
+                <p>明智光秀</p>
+                <p>豊臣秀吉</p>
+                <p>です</p>
+            </div>
+        </details>
+
+        <details class="hint-box">
+            <summary class="hint-summary">ヒント2（タップして開く）</summary>
+            <div class="hint-content">
+                <p>これらの偉人の名前を平仮名にすると何か分かるかも?</p>
+            </div>
+        </details>
+
+    </div>
+    <img src="../images/謎2.jpg" alt="ここに画像を表示">
+
+    <input type="text" id="answer-input" placeholder="答えを入力してください" />
+    <button id="submit-button">回答する</button>
+
+    <div id="message" class="result-message"></div>
+
+    <script>
+        // HTMLの要素をJavaScriptに読み込みます
+        const button = document.getElementById("submit-button");
+        const input = document.getElementById("answer-input");
+        const message = document.getElementById("message");
+
+        // 💡 ページを開いた瞬間に、すでにクリアしているか確認する
+        window.addEventListener("load", function () {
+            // localStorageから「q1_cleared」というメモを読み出す
+            let isCleared = localStorage.getItem("q2_cleared");
+
+            if (isCleared === "true") {
+                // すでにクリアしていたら、最初から正解画面にしておく
+                showSuccess();
+            }
+        });
+
+        // ボタンがクリックされたときの処理
+        button.addEventListener("click", function () {
+            let userAnswer = input.value.trim().toLowerCase();
+
+            if (userAnswer === "8") {
+                // 💡 正解したら、localStorageに「q1_cleared = true」と保存する
+                localStorage.setItem("q2_cleared", "true");
+                showSuccess();
+            }
+
+            else if (userAnswer === "reset") {
+                localStorage.clear();
+                message.textContent = "リセットします";
+            }
+
+            else {
+                message.textContent = "❌ 違います。もう一度考えてみよう！";
+                message.style.color = "#dc3545";
+            }
+        });
+
+        // ⭕ 正解の表示を共通化する関数
+        // ⭕ 正解の表示を共通化する関数
+        function showSuccess() {
+            // textContent ではなく innerHTML を使うと、<br>（改行）などのHTMLタグも使えます
+            // 文字列を「 ` 」（バッククォーツ）で囲むのがポイントです！
+            message.innerHTML = `
+                <p style="font-size: 24px; color: #28a745; margin-bottom: 10px;">⭕ 正解！</p>
+
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; text-align: left; border: 1px solid #dee2e6;">
+                    <strong>【 解説 】</strong><br>
+                    正解は8です<br>
+                    上から豊臣秀吉、織田信長、明智光秀、そして徳川家康のイラストです<br><br>
+                    <p>その横に8、6、7と数字があります</p>
+                    <p>この数字の意味は武将の名前を平仮名にすると分かります</p>
+                    <p>平仮名にすると"とよとみひでよし"、"おだのぶなが"、"あけちみつひで"、"とくがわいえやす"...</p>
+                    <p>という風に、この数字は名前を平仮名にした時の文字数なのです</p>
+                    <br>
+                    なので"?"に入る数字は8ということです
+                </div>
+
+                <p style="margin-top: 15px; font-weight: bold;">次の問題へ進んでください。</p>
+`;
+
+            // 入力欄とボタンを無効化する
+
+            input.value = "8"; // 答えを固定
+        }
+    </script>
+
+    <h2><a href="../index.html">ホーム画面</a></h2>
+
+</body>
+</html>
